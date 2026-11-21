@@ -1,8 +1,10 @@
 # Keepsake
 
-Keepsake is an offline backup tool for project folders, notes, and other local files. It saves snapshots, reuses identical file contents, compares versions, checks stored data, and restores an earlier version into a new folder.
+Keepsake is an offline backup and recovery project. The working prototype captures local folders, reuses identical file contents, compares snapshots, checks stored data, and restores an earlier version into a new folder.
 
-The current version has a Python engine and command-line tool. Resuming interrupted work, recovering a damaged catalog, deleting expired snapshots, and moving backups between machines are planned features.
+The planned system will use five local node processes to coordinate replicated storage, resumable capture and transfers, concurrent snapshot branches, repair, safe retention, and disaster recovery. It will run on one supported desktop through loopback or controlled message queues. Separate node directories simulate storage faults; they are not independent physical disks.
+
+Only the single-vault Python engine and CLI described below exist today. There is no cluster, consensus, chunking, resumable job, applied retention, or replication command in the current code. The [target system design](docs/system-design.md) defines those future protocols and failure boundaries.
 
 ## Run it
 
@@ -54,6 +56,14 @@ Successful commands exit with status `0`. Verification issues return `1`; invali
 
 Retention is a preview only. There is no delete or garbage-collection command in this version.
 
+## Target system
+
+The target separates immutable chunks and independently readable manifests from a replicated metadata log. By default, publication will require three verified durable data replicas and a majority metadata commit. Lost responses will be resolved through stable operation IDs; an uncertain outcome will not be presented as success.
+
+Concurrent captures will remain separate branches. Quorum loss will block fresh metadata queries and new commits. Retention and garbage collection will protect retained snapshots, active restores, unfinished jobs, and exports. Corruption repair will require a healthy copy; temporarily unreachable data will be reported as unavailable.
+
+The [12 planned stages](docs/roadmap.md) are grouped into three phases. A stage may require several coding sessions. The current single-vault tests establish none of these target guarantees.
+
 ## Capture and restore behavior
 
 Nothing is excluded by default. Add `--exclude` for paths you don't want captured:
@@ -90,4 +100,4 @@ scripts/        Local development helpers
 docs/           Architecture, acceptance criteria, and roadmap
 ```
 
-Read the [architecture](docs/architecture.md) for the storage format and failure boundaries, or the [roadmap](docs/roadmap.md) for the remaining work. [Data and licensing](docs/data-and-license.md) covers the sample files and the MIT license.
+Read the [baseline architecture](docs/architecture.md) for the implemented storage format, the [target system design](docs/system-design.md) for the proposed protocols, and the [roadmap](docs/roadmap.md) for the remaining work. [Data and licensing](docs/data-and-license.md) covers the sample files and the MIT license.

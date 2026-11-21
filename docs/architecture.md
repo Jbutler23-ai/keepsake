@@ -1,4 +1,6 @@
-# Architecture
+# Baseline architecture
+
+This document describes the implemented single-vault engine. The proposed five-node system is specified separately in [system design](system-design.md). Its replication and recovery guarantees do not apply to this version.
 
 Keepsake separates a snapshot's manifest from its file contents. The manifest says which paths belong to a snapshot. Objects hold the bytes. A second snapshot can point to the same objects without storing another copy.
 
@@ -54,8 +56,8 @@ This is a local tool for a vault controlled by the same user. It is not a securi
 
 `logical_bytes` counts file bytes across snapshots, including repeated references. `stored_bytes` counts stored object bytes, so shared contents count once. Object counts and orphan counts describe content objects, not the total vault footprint. SQLite files, directories, and filesystem overhead are additional storage.
 
-## Planned format changes
+## Boundary to the target system
 
-Resumable capture needs a durable job journal that can be reconciled with committed manifests. Catalog recovery needs independently readable snapshot manifests. Safe retention needs a transaction that chooses expired snapshots and a recoverable object-deletion phase. Chunk-level deduplication needs a versioned object format and migration tests.
+The target requires versioned chunk manifests, durable job journals, a replicated metadata log, explicit replica receipts, and coordinated retention. None is represented by the current SQLite catalog or `write.lock`. A local snapshot is not a replicated commit, and retention preview does not authorize deletion.
 
-Format changes need versioned migrations and compatibility fixtures so completed snapshots remain distinguishable from incomplete work. The [roadmap](roadmap.md) gives the planned order and acceptance checks.
+The first planned stage introduces independently readable manifests and compatibility fixtures. Existing whole-file snapshots must remain restorable during migration. Later stages add node processes without treating old catalogs as consensus logs. See the [system design](system-design.md) and [12-stage roadmap](roadmap.md).
