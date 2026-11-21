@@ -1,0 +1,7 @@
+Workshop shelf plan
+
+Check the wall spacing before cutting boards.
+Allow extra material for saw cuts and damaged ends.
+The values in config/shelves.json are sample measurements.
+
+To try a second snapshot, change a shelf length or add a new shelf.

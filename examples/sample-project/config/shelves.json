@@ -1,0 +1,6 @@
+{
+  "shelves": [
+    {"name": "Upper shelf", "quantity": 2, "length_mm": 900},
+    {"name": "Small shelf", "quantity": 3, "length_mm": 450}
+  ]
+}
